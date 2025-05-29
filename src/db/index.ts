@@ -1,4 +1,4 @@
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/neon-http";
 
 const dbUrl = process.env.DATABASE_URL;
 
