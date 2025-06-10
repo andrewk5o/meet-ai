@@ -19,23 +19,26 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { signUp } from "@/lib/auth-client";
+import { signIn, signUp } from "@/lib/auth-client";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 
-const formSchema = z.object({
-  name: z.string().min(3, {
-    message: "Name is required",
-  }),
-  email: z.string().email(),
-  password: z.string().min(8, {
-    message: "Password is required",
-  }),
-  confirmPassword: z.string().min(8, {
-    message: "Password is required",
-  }),
-}).refine((data) => data.password === data.confirmPassword, {
-  path: ["confirmPassword"],
-  message: "Passwords do not match",
-});
+const formSchema = z
+  .object({
+    name: z.string().min(3, {
+      message: "Name is required",
+    }),
+    email: z.string().email(),
+    password: z.string().min(8, {
+      message: "Password is required",
+    }),
+    confirmPassword: z.string().min(8, {
+      message: "Password is required",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
 
 export const SignUpView = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -54,18 +57,42 @@ export const SignUpView = () => {
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     setError(null);
     setPending(true);
-    signUp.email({ name: data.name, email: data.email, password: data.password }, {
-      onSuccess: () => {
-        router.push("/");
+    signUp.email(
+      {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        callbackURL: "/",
       },
-      onError: ({ error }) => {
-        setError(error.message);
-      },
-      onResponse: () => {
-        setPending(false);
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: ({ error }) => {
+          setError(error.message);
+        },
+        onResponse: () => {
+          setPending(false);
+        },
       }
-    });
-  }
+    );
+  };
+
+  const onSocialSignIn = (provider: "google" | "github") => () => {
+    setError(null);
+    setPending(true);
+    signIn.social(
+      { provider, callbackURL: "/" },
+      {
+        onError: ({ error }) => {
+          setError(error.message);
+        },
+        onResponse: () => {
+          setPending(false);
+        },
+      }
+    );
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -169,16 +196,33 @@ export const SignUpView = () => {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" className="w-full" type="button" disabled={pending}>
-                    Google
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    type="button"
+                    disabled={pending}
+                    onClick={onSocialSignIn("google")}
+                  >
+                    <FaGoogle />
                   </Button>
-                  <Button variant="outline" className="w-full" type="button" disabled={pending}>
-                    Github
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    type="button"
+                    disabled={pending}
+                    onClick={onSocialSignIn("github")}
+                  >
+                    <FaGithub />
                   </Button>
                 </div>
                 <div className="text-center text-sm">
                   Already have an account?{" "}
-                  <Link href="/sign-in" className="underline underline-offset-4">Sign in</Link>
+                  <Link
+                    href="/sign-in"
+                    className="underline underline-offset-4"
+                  >
+                    Sign in
+                  </Link>
                 </div>
               </div>
             </form>
@@ -190,7 +234,8 @@ export const SignUpView = () => {
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        and <a href="#">Privacy Policy</a>
       </div>
     </div>
   );
