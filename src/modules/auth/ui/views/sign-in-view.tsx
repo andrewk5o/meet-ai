@@ -148,6 +148,7 @@ export const SignInView = () => {
                     type="button"
                     disabled={pending}
                     onClick={onSocialSignIn("google")}
+                    aria-label="Sign in with Google"
                   >
                     <FaGoogle />
                   </Button>
@@ -157,6 +158,7 @@ export const SignInView = () => {
                     type="button"
                     disabled={pending}
                     onClick={onSocialSignIn("github")}
+                    aria-label="Sign in with GitHub"
                   >
                     <FaGithub />
                   </Button>

@@ -202,6 +202,7 @@ export const SignUpView = () => {
                     type="button"
                     disabled={pending}
                     onClick={onSocialSignIn("google")}
+                    aria-label="Sign up with Google"
                   >
                     <FaGoogle />
                   </Button>
@@ -211,6 +212,7 @@ export const SignUpView = () => {
                     type="button"
                     disabled={pending}
                     onClick={onSocialSignIn("github")}
+                    aria-label="Sign up with GitHub"
                   >
                     <FaGithub />
                   </Button>
